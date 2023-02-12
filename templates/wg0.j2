@@ -1,0 +1,25 @@
+[Interface]
+PrivateKey = {{ vpn_wg0_private_key }}
+ListenPort = {{ vpn_wg0_port }}
+Address    = {{ vpn_wg0_iface }}/24{% if ansible_hostname == "nuremberg" %},{{ vpn_wg0_ipv6_iface }}/64
+{% endif %}
+
+PostUp     = iptables -A INPUT -p udp --dport {{ vpn_wg0_port }} -j ACCEPT
+PostUp     = iptables -A INPUT -i wg0 -j ACCEPT
+PostUp     = iptables -A FORWARD -i %i -o %i -s {{ vpn_wg0_subnet }}/24 -d {{ vpn_wg0_subnet }}/24 -j ACCEPT
+PostUp     = iptables -A FORWARD -i %i -o {{ ansible_default_ipv4.alias }} -s {{ vpn_wg0_subnet }}/24 -j ACCEPT
+PostUp     = iptables -A FORWARD -i {{ ansible_default_ipv4.alias }} -o %i -d {{ vpn_wg0_subnet }}/24 -j ACCEPT
+PostUp     = iptables -t nat -A POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
+{% if ansible_hostname == "nuremberg" %}
+PostUp     = ip6tables -t nat -A POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
+{% endif %}
+
+PostDown   = iptables -D INPUT -p udp --dport {{ vpn_wg0_port }} -j ACCEPT
+PostDown   = iptables -D INPUT -i wg0 -j ACCEPT
+PostDown   = iptables -D FORWARD -i %i -o %i -s {{ vpn_wg0_subnet }}/24 -d {{ vpn_wg0_subnet }}/24 -j ACCEPT
+PostDown   = iptables -D FORWARD -i %i -o {{ ansible_default_ipv4.alias }} -s {{ vpn_wg0_subnet }}/24 -j ACCEPT
+PostDown   = iptables -D FORWARD -i {{ ansible_default_ipv4.alias }} -o %i -d {{ vpn_wg0_subnet }}/24 -j ACCEPT
+PostDown   = iptables -t nat -D POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
+{% if ansible_hostname == "nuremberg" %}
+PostDown   = ip6tables -t nat -D POSTROUTING -o {{ ansible_default_ipv4.alias }} -j MASQUERADE
+{% endif %}

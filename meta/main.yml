@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Ark4diiV
+  description: This role will deploy wireguard vpn network
+  company: NoName
+  license: MIT
+  role_name: arole_linux_wireguard
+  namespace: prod
+  min_ansible_version: "2.14.0"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags: []
+dependencies: []

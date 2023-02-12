@@ -1,0 +1,26 @@
+---
+- name: Install packages
+  ansible.builtin.apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: true
+
+- name: Prevent possible package conflicts
+  ansible.builtin.file:
+    src: /usr/bin/resolvectl
+    dest: /usr/local/bin/resolvconf
+    state: link
+
+# Configure wg0
+- name: Include wg0_configure.yaml
+  ansible.builtin.include_tasks: wg0_configure.yaml
+  when: vpn_wg0 == "true"
+
+# Confiregure wg1
+- name: Include wg1_configure.yaml
+  ansible.builtin.include_tasks: wg1_configure.yaml
+
+# Configure unbound
+- name: Include unbound_configure.yaml
+  ansible.builtin.include_tasks: unbound_configure.yaml
+  when: vpn_wg0 == "true"

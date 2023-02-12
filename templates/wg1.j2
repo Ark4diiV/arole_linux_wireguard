@@ -1,0 +1,11 @@
+[Interface]
+PrivateKey = {{ vpn_wg1_private_key }}
+Address    = {{ vpn_wg1_address }}/32{% if ansible_hostname == "nuremberg" %},{{ vpn_wg1_ipv6_iface }}/64
+{% endif %}
+{% if ansible_hostname == "nuremberg" %}
+ListenPort = {{ vpn_wg1_port }}
+{% endif %}
+
+PostUp     = iptables -A INPUT -i wg1 -j ACCEPT
+
+PostDown   = iptables -D INPUT -i wg1 -j ACCEPT

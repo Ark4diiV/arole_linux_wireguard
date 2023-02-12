@@ -1,0 +1,26 @@
+---
+- name: Copy resolved.conf
+  ansible.builtin.copy:
+    src: resolved.conf
+    dest: /etc/systemd/resolved.conf
+    mode: '644'
+
+- name: Disable systemd-resolved.service
+  ansible.builtin.systemd:
+    name: systemd-resolved.service
+    state: stopped
+    enabled: false
+
+- name: Remove resolv.conf
+  ansible.builtin.file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Configure unbound
+  notify: Unbound_restart
+  block:
+    - name: Copy Unbound config template
+      ansible.builtin.template:
+        src: unbound.j2
+        dest: /etc/unbound/unbound.conf
+        mode: '644'

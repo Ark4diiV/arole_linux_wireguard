@@ -1,0 +1,27 @@
+---
+- name: Configure wg0
+  notify: Wg0_restart
+  block:
+    - name: Copy WG0 iface config template
+      ansible.builtin.template:
+        src: wg0.j2
+        dest: /etc/wireguard/wg0.conf
+        mode: '600'
+
+    - name: Add WG0 Oregon clients info
+      ansible.builtin.blockinfile:
+        path: /etc/wireguard/wg0.conf
+        block: "{{ lookup('template', 'files/wg0_oregon.conf') }}"
+      when: ansible_hostname == "oregon"
+
+    - name: Add WG0 Nuremberg clients info
+      ansible.builtin.blockinfile:
+        path: /etc/wireguard/wg0.conf
+        block: "{{ lookup('template', 'files/wg0_nuremberg.conf') }}"
+      when: ansible_hostname == "nuremberg"
+
+    - name: Add WG0 MSK clients info
+      ansible.builtin.blockinfile:
+        path: /etc/wireguard/wg0.conf
+        block: "{{ lookup('template', 'files/wg0_msk.conf') }}"
+      when: ansible_hostname == "msk"

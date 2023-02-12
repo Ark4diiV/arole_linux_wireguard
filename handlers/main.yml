@@ -1,0 +1,21 @@
+---
+- name: Wg0_restart
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: wg-quick@wg0.service
+    state: restarted
+    enabled: true
+
+- name: Wg1_restart
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: wg-quick@wg1.service
+    state: restarted
+    enabled: true
+
+- name: Unbound_restart
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: unbound.service
+    state: restarted
+    enabled: true
